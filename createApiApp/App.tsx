@@ -1,17 +1,7 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
-import React, {type PropsWithChildren} from 'react';
+import React from 'react';
 import {
+  Button,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -19,98 +9,79 @@ import {
   View,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-const Section: React.FC<
-  PropsWithChildren<{
-    title: string;
-  }>
-> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {employeeApi} from './src/features/employee/employeeAPI';
 
 const App = () => {
+  const [trigger, result] = employeeApi.endpoints.fetchEmployees.useLazyQuery();
+
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  let renderedList =
+    result.isLoading || result.error !== undefined ? (
+      <Text>
+        {result.error === undefined
+          ? 'Loading...'
+          : JSON.stringify(result.error)}
+      </Text>
+    ) : (
+      result.data !== undefined &&
+      result.data.data.map(employee => (
+        <View style={styles.employeeWrapper} key={employee.id}>
+          <Text style={styles.textCenter}>Employee_id : {employee.id}</Text>
+          <Text style={styles.textCenter}>
+            Employee Name : {employee.employee_name}
+          </Text>
+          <Text style={styles.textCenter}>
+            Employee Salary : {employee.employee_salary}
+          </Text>
+          <Text style={styles.textCenter}>
+            Employee Age : {employee.employee_age}
+          </Text>
+        </View>
+      ))
+    );
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+      <Button
+        title="Get Employees"
+        onPress={() => {
+          trigger();
+        }}
+      />
+      {renderedList}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  scrollView: {
+    backgroundColor: Colors.lighter,
   },
-  sectionTitle: {
-    fontSize: 24,
+  engine: {
+    position: 'absolute',
+    right: 0,
+  },
+  footer: {
+    color: Colors.dark,
+    fontSize: 12,
     fontWeight: '600',
+    padding: 4,
+    paddingRight: 12,
+    textAlign: 'right',
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  textCenter: {
+    textAlign: 'center',
   },
-  highlight: {
-    fontWeight: '700',
+  employeeWrapper: {
+    padding: 10,
+    borderBottomWidth: 1,
   },
 });
 
