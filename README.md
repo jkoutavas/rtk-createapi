@@ -30,5 +30,6 @@ Then press the "Get Employees" button and you'll see this displayed:
 
 ```
 $ npx react-native init createApiApp --template react-native-template-typescript
-$ yarn add @reduxjs/toolkit
+$ yarn add @reduxjs/toolkit react-redux
+$ yarn add @types/react-redux --dev
 ```
